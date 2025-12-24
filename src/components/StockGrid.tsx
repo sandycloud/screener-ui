@@ -1,6 +1,7 @@
 import { TrendingUp, TrendingDown } from "lucide-react";
+import { StockAdxCriteriaDto } from "../services/stockApi";
 
-export function StockGrid({ stocks, isLoading }) {
+export function StockGrid({ stocks, isLoading }: { stocks: StockAdxCriteriaDto[]; isLoading: boolean }) {
   const formatVolume = (volume) => {
     if (volume >= 1000000) {
       return `${(volume / 1000000).toFixed(2)}M`;
@@ -19,6 +20,14 @@ export function StockGrid({ stocks, isLoading }) {
     );
   }
 
+  if (stocks.length === 0 && !isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-[#b0b0b0]">No stocks found. Please submit a search.</div>
+      </div>
+    );
+  }
+
   return (
     <div className="overflow-x-auto">
       {/* Desktop Table View */}
@@ -27,41 +36,46 @@ export function StockGrid({ stocks, isLoading }) {
           <tr className="border-b border-[#505050]">
             <th className="text-left py-3 px-4 text-[#b0b0b0]">#</th>
             <th className="text-left py-3 px-4 text-[#b0b0b0]">Symbol</th>
-            <th className="text-left py-3 px-4 text-[#b0b0b0]">Stock Name</th>
-            <th className="text-right py-3 px-4 text-[#b0b0b0]">Price</th>
-            <th className="text-right py-3 px-4 text-[#b0b0b0]">Volume</th>
+            <th className="text-left py-3 px-4 text-[#b0b0b0]">ISIN</th>
+            <th className="text-right py-3 px-4 text-[#b0b0b0]">Price Change</th>
             <th className="text-right py-3 px-4 text-[#b0b0b0]">% Change</th>
+            <th className="text-right py-3 px-4 text-[#b0b0b0]">Volume</th>
+            <th className="text-right py-3 px-4 text-[#b0b0b0]">Avg Volume</th>
           </tr>
         </thead>
         <tbody>
           {stocks.map((stock, index) => (
             <tr
-              key={stock.id}
+              key={stock.isin || index}
               className="border-b border-[#454545] hover:bg-[#3a3a3a] transition-colors"
             >
               <td className="py-3 px-4 text-[#909090]">{index + 1}</td>
-              <td className="py-3 px-4 text-white">{stock.symbol}</td>
-              <td className="py-3 px-4 text-[#b0b0b0]">{stock.name}</td>
+              <td className="py-3 px-4 text-white font-medium">{stock.sym}</td>
+              <td className="py-3 px-4 text-[#b0b0b0] text-sm">{stock.isin}</td>
               <td className="py-3 px-4 text-right text-white">
-                ${stock.price.toFixed(2)}
-              </td>
-              <td className="py-3 px-4 text-right text-[#b0b0b0]">
-                {formatVolume(stock.volume)}
+                {stock.pchange >= 0 ? "+" : ""}
+                {stock.pchange.toFixed(2)}
               </td>
               <td className="py-3 px-4 text-right">
                 <div
                   className={`flex items-center justify-end gap-1 ${
-                    stock.change >= 0 ? "text-[#00c853]" : "text-[#ff1744]"
+                    stock.pPerchange >= 0 ? "text-[#00c853]" : "text-[#ff1744]"
                   }`}
                 >
-                  {stock.change >= 0 ? (
+                  {stock.pPerchange >= 0 ? (
                     <TrendingUp size={16} />
                   ) : (
                     <TrendingDown size={16} />
                   )}
-                  {stock.change >= 0 ? "+" : ""}
-                  {stock.change.toFixed(2)}%
+                  {stock.pPerchange >= 0 ? "+" : ""}
+                  {stock.pPerchange.toFixed(2)}%
                 </div>
+              </td>
+              <td className="py-3 px-4 text-right text-[#b0b0b0]">
+                {formatVolume(stock.volume)}
+              </td>
+              <td className="py-3 px-4 text-right text-[#b0b0b0]">
+                {formatVolume(stock.averageVolume)}
               </td>
             </tr>
           ))}
@@ -72,38 +86,45 @@ export function StockGrid({ stocks, isLoading }) {
       <div className="md:hidden space-y-3">
         {stocks.map((stock, index) => (
           <div
-            key={stock.id}
+            key={stock.isin || index}
             className="bg-[#3a3a3a] border border-[#505050] rounded-lg p-4"
           >
             <div className="flex items-start justify-between mb-2">
               <div>
-                <div className="text-white mb-1">
-                  #{index + 1} {stock.symbol}
+                <div className="text-white mb-1 font-medium">
+                  #{index + 1} {stock.sym}
                 </div>
-                <div className="text-[#909090]">{stock.name}</div>
+                <div className="text-[#909090] text-sm">{stock.isin}</div>
               </div>
               <div
                 className={`flex items-center gap-1 ${
-                  stock.change >= 0 ? "text-[#00c853]" : "text-[#ff1744]"
+                  stock.pPerchange >= 0 ? "text-[#00c853]" : "text-[#ff1744]"
                 }`}
               >
-                {stock.change >= 0 ? (
+                {stock.pPerchange >= 0 ? (
                   <TrendingUp size={16} />
                 ) : (
                   <TrendingDown size={16} />
                 )}
-                {stock.change >= 0 ? "+" : ""}
-                {stock.change.toFixed(2)}%
+                {stock.pPerchange >= 0 ? "+" : ""}
+                {stock.pPerchange.toFixed(2)}%
               </div>
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <div className="text-[#909090]">Price</div>
-                <div className="text-white">${stock.price.toFixed(2)}</div>
+                <div className="text-[#909090]">Price Change</div>
+                <div className="text-white">
+                  {stock.pchange >= 0 ? "+" : ""}
+                  {stock.pchange.toFixed(2)}
+                </div>
               </div>
               <div>
                 <div className="text-[#909090]">Volume</div>
                 <div className="text-[#b0b0b0]">{formatVolume(stock.volume)}</div>
+              </div>
+              <div>
+                <div className="text-[#909090]">Avg Volume</div>
+                <div className="text-[#b0b0b0]">{formatVolume(stock.averageVolume)}</div>
               </div>
             </div>
           </div>

@@ -3,18 +3,19 @@ import { Search } from "lucide-react";
 
 export function FilterSection({ onSubmit, isLoading }) {
   const [timeframe, setTimeframe] = useState("5min");
+  const [trend, setTrend] = useState("uptrend");
   const [volume, setVolume] = useState("");
   const [adx, setAdx] = useState("");
   const [ema, setEma] = useState("10");
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit({ timeframe, volume, adx, ema });
+    onSubmit({ timeframe, trend, volume, adx, ema });
   };
 
   return (
     <form onSubmit={handleSubmit}>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
         {/* Timeframe */}
         <div>
           <label className="block text-[#b0b0b0] mb-2">Timeframe</label>
@@ -26,6 +27,19 @@ export function FilterSection({ onSubmit, isLoading }) {
             <option value="5min">5 mins</option>
             <option value="15min">15 mins</option>
             <option value="1hr">1 hr</option>
+          </select>
+        </div>
+
+        {/* Trend */}
+        <div>
+          <label className="block text-[#b0b0b0] mb-2">Trend</label>
+          <select
+            value={trend}
+            onChange={(e) => setTrend(e.target.value)}
+            className="w-full bg-[#2a2a2a] border border-[#505050] rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-[#0066ff] transition-colors"
+          >
+            <option value="uptrend">Uptrend</option>
+            <option value="downtrend">Downtrend</option>
           </select>
         </div>
 

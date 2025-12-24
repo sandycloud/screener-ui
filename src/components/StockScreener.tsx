@@ -1,33 +1,34 @@
 import { useState } from "react";
 import { FilterSection } from "./FilterSection";
 import { StockGrid } from "./StockGrid";
-
-const mockStocks = [
-  { id: 1, symbol: "AAPL", name: "Apple Inc.", price: 182.45, volume: 58234567, change: 2.34 },
-  { id: 2, symbol: "MSFT", name: "Microsoft Corporation", price: 378.92, volume: 42156789, change: 1.87 },
-  { id: 3, symbol: "GOOGL", name: "Alphabet Inc.", price: 141.23, volume: 35678912, change: -0.45 },
-  { id: 4, symbol: "AMZN", name: "Amazon.com Inc.", price: 155.67, volume: 48923456, change: 3.21 },
-  { id: 5, symbol: "TSLA", name: "Tesla Inc.", price: 238.45, volume: 125678934, change: -1.56 },
-  { id: 6, symbol: "META", name: "Meta Platforms Inc.", price: 352.89, volume: 28456123, change: 4.12 },
-  { id: 7, symbol: "NVDA", name: "NVIDIA Corporation", price: 495.22, volume: 67234891, change: 5.67 },
-  { id: 8, symbol: "JPM", name: "JPMorgan Chase & Co.", price: 178.34, volume: 18765432, change: 0.89 },
-];
+import { getAdxCriteriaStocks, StockAdxCriteriaDto } from "../services/stockApi";
 
 export function StockScreener() {
-  const [stocks, setStocks] = useState(mockStocks);
+  const [stocks, setStocks] = useState<StockAdxCriteriaDto[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (criteria) => {
+  const handleSubmit = async (criteria: {
+    timeframe: string;
+    trend: string;
+    volume?: string;
+    adx?: string;
+    ema?: string;
+  }) => {
     setIsLoading(true);
+    setError(null);
     
-    // Simulate API call
-    setTimeout(() => {
-      // In a real app, this would filter based on criteria
-      // For now, we'll just shuffle the mock data
-      const shuffled = [...mockStocks].sort(() => Math.random() - 0.5);
-      setStocks(shuffled);
+    try {
+      const data = await getAdxCriteriaStocks(criteria.timeframe, criteria.trend);
+      setStocks(data);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to fetch stocks";
+      setError(errorMessage);
+      console.error("Error fetching stocks:", err);
+      setStocks([]);
+    } finally {
       setIsLoading(false);
-    }, 800);
+    }
   };
 
   return (
@@ -41,6 +42,15 @@ export function StockScreener() {
       <div className="p-6 border-b border-[#505050]">
         <FilterSection onSubmit={handleSubmit} isLoading={isLoading} />
       </div>
+
+      {/* Error Message */}
+      {error && (
+        <div className="p-6 border-b border-[#505050]">
+          <div className="bg-[#ff1744] bg-opacity-20 border border-[#ff1744] rounded-lg px-4 py-3 text-[#ff1744]">
+            <strong>Error:</strong> {error}
+          </div>
+        </div>
+      )}
 
       {/* Results Grid */}
       <div className="p-6">
