@@ -11,7 +11,8 @@ node --version
 npm --version
 ```
 
-If you see version numbers (like `v18.17.0` and `9.6.7`), you're good to go! ✅
+If you see version numbers (like node :`v22.14.0` and for npm `10.9.2`), you're good to go! 
+Note: It is not tested on older versions.
 
 If you get an error, download and install Node.js from: https://nodejs.org/
 - Download the LTS (Long Term Support) version
