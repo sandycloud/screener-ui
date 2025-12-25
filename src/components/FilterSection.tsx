@@ -38,8 +38,8 @@ export function FilterSection({ onSubmit, isLoading }) {
             onChange={(e) => setTrend(e.target.value)}
             className="w-full bg-[#2a2a2a] border border-[#505050] rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-[#0066ff] transition-colors"
           >
-            <option value="uptrend">Uptrend</option>
-            <option value="downtrend">Downtrend</option>
+            <option value="up">Uptrend</option>
+            <option value="down">Downtrend</option>
           </select>
         </div>
 

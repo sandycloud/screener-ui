@@ -2,7 +2,10 @@ import { TrendingUp, TrendingDown } from "lucide-react";
 import { StockAdxCriteriaDto } from "../services/stockApi";
 
 export function StockGrid({ stocks, isLoading }: { stocks: StockAdxCriteriaDto[]; isLoading: boolean }) {
-  const formatVolume = (volume) => {
+  const formatVolume = (volume: number | null | undefined) => {
+    if (volume == null || isNaN(volume)) {
+      return "N/A";
+    }
     if (volume >= 1000000) {
       return `${(volume / 1000000).toFixed(2)}M`;
     }
@@ -10,6 +13,25 @@ export function StockGrid({ stocks, isLoading }: { stocks: StockAdxCriteriaDto[]
       return `${(volume / 1000).toFixed(2)}K`;
     }
     return volume.toString();
+  };
+
+  const formatNumber = (value: number | null | undefined): string => {
+    if (value == null || isNaN(value)) {
+      return "0.00";
+    } else {
+      //alert(`formatNumber ELSE condition - value: ${value}, type: ${typeof value}, formatted: ${value.toFixed(2)}`);
+      return value.toFixed(2);
+    }
+  };
+
+  const formatPercentChange = (value: number | null | undefined): string => {
+    if (value == null || isNaN(value)) {
+      //alert(`formatPercentChange IF condition TRUE - value: ${value}, type: ${typeof value}, isNull: ${value == null}, isNaN: ${isNaN(value as number)}`);
+      return "0.00";
+    } else {
+      //alert(`formatPercentChange ELSE condition - value: ${value}, type: ${typeof value}, formatted: ${value.toFixed(2)}`);
+      return value.toFixed(2);
+    }
   };
 
   if (isLoading) {
@@ -53,22 +75,22 @@ export function StockGrid({ stocks, isLoading }: { stocks: StockAdxCriteriaDto[]
               <td className="py-3 px-4 text-white font-medium">{stock.sym}</td>
               <td className="py-3 px-4 text-[#b0b0b0] text-sm">{stock.isin}</td>
               <td className="py-3 px-4 text-right text-white">
-                {stock.pchange >= 0 ? "+" : ""}
-                {stock.pchange.toFixed(2)}
+                {(stock.pchange ?? 0) >= 0 ? "+" : ""}
+                {formatNumber(stock.pchange)}
               </td>
               <td className="py-3 px-4 text-right">
                 <div
                   className={`flex items-center justify-end gap-1 ${
-                    stock.pPerchange >= 0 ? "text-[#00c853]" : "text-[#ff1744]"
+                    (stock.prcPerChange ?? 0) >= 0 ? "text-[#00c853]" : "text-[#ff1744]"
                   }`}
                 >
-                  {stock.pPerchange >= 0 ? (
+                  {(stock.prcPerChange ?? 0) >= 0 ? (
                     <TrendingUp size={16} />
                   ) : (
                     <TrendingDown size={16} />
                   )}
-                  {stock.pPerchange >= 0 ? "+" : ""}
-                  {stock.pPerchange.toFixed(2)}%
+                  {(stock.prcPerChange ?? 0) >= 0 ? "+" : ""}
+                  {formatPercentChange(stock.prcPerChange)}%
                 </div>
               </td>
               <td className="py-3 px-4 text-right text-[#b0b0b0]">
@@ -98,24 +120,24 @@ export function StockGrid({ stocks, isLoading }: { stocks: StockAdxCriteriaDto[]
               </div>
               <div
                 className={`flex items-center gap-1 ${
-                  stock.pPerchange >= 0 ? "text-[#00c853]" : "text-[#ff1744]"
+                  (stock.prcPerChange ?? 0) >= 0 ? "text-[#00c853]" : "text-[#ff1744]"
                 }`}
               >
-                {stock.pPerchange >= 0 ? (
+                {(stock.prcPerChange ?? 0) >= 0 ? (
                   <TrendingUp size={16} />
                 ) : (
                   <TrendingDown size={16} />
                 )}
-                {stock.pPerchange >= 0 ? "+" : ""}
-                {stock.pPerchange.toFixed(2)}%
+                {(stock.prcPerChange ?? 0) >= 0 ? "+" : ""}
+                {formatPercentChange(stock.prcPerChange)}%
               </div>
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div>
                 <div className="text-[#909090]">Price Change</div>
                 <div className="text-white">
-                  {stock.pchange >= 0 ? "+" : ""}
-                  {stock.pchange.toFixed(2)}
+                  {(stock.pchange ?? 0) >= 0 ? "+" : ""}
+                  {formatNumber(stock.pchange)}
                 </div>
               </div>
               <div>

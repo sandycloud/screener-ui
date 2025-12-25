@@ -4,10 +4,10 @@ import { API_CONFIG } from '../config/api';
 export interface StockAdxCriteriaDto {
   isin: string;
   sym: string;
-  pPerchange: number;
-  pchange: number;
-  volume: number;
-  averageVolume: number;
+  prcPerChange: number | null | undefined;
+  pchange: number | null | undefined;
+  volume: number | null | undefined;
+  averageVolume: number | null | undefined;
 }
 
 /**

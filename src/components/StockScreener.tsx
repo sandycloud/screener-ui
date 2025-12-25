@@ -20,6 +20,7 @@ export function StockScreener() {
     
     try {
       const data = await getAdxCriteriaStocks(criteria.timeframe, criteria.trend);
+	  //console.log("api returned:", data);
       setStocks(data);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Failed to fetch stocks";
